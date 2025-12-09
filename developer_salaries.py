@@ -29,7 +29,7 @@ def normalize_region_names(geo_df, csv_df):
     return geo_df, csv_df
 
 # ===== CHOROPLETH =====
-def build_choropleth(csv_data, geo_data):
+def build_choropleth_graph(csv_data, geo_data):
     # Aggregate salary by region
     region_salary = (
         csv_data
@@ -50,19 +50,39 @@ def build_choropleth(csv_data, geo_data):
         geojson=geojson,
         locations='shapeName',
         featureidkey='properties.shapeName',
-        color='avg_salary',
+        color="avg_salary",
         color_continuous_scale='Viridis',
         labels={'avg_salary': 'Snittlønn (NOK)'},
-        title='Utviklerlønn i Norge',
+        title='Gjennomsnittlig utviklerlønn per fylke',
         hover_name='shapeName',
-        hover_data={'avg_salary': ':.0f'}
+        hover_data={'avg_salary': ':,.0f kr', 'shapeName': False}
     )
 
-    # Layout similar to the Plotly example
-    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_geos(
+        fitbounds="locations",
+        visible=False,
+        bgcolor="#1a1a1a"
+    )
+    
+    fig.update_traces(
+        marker_line_color="#ffffff",  # white borders
+        marker_line_width=0.7,
+    )
+
     fig.update_layout(
-        margin={"r":0,"t":40,"l":0,"b":0},
+        margin={"r":20,"t":70,"l":20,"b":20},
         height=650,
+        paper_bgcolor="#1a1a1a",
+        plot_bgcolor="#1a1a1a",
+        font=dict(color="#ffffff", size=14),
+        title_font_size=24,
+        title_x=0.5,
+        coloraxis_colorbar=dict(
+            title="Lønn (NOK)",
+            tickformat=",.0f",
+            tickfont=dict(size=12, color="#ffffff"),
+            titlefont=dict(size=14, color="#ffffff")
+        )
     )
     return fig
 
@@ -159,7 +179,8 @@ def build_dashboard(csv_data, geo_data):
             },
         children=[
             html.H2("Utviklerlønn i Norge"),
-            dcc.Graph(id="choropleth", figure=build_choropleth(csv_data, geo_data)),
+            dcc.Graph(
+                id="choropleth", figure=build_choropleth_graph(csv_data, geo_data)),
             dcc.Graph(id="experience", figure=avg_salary_and_yearly_experience_graph(csv_data, geo_data)),
             dcc.Graph(id="fag", figure=salary_tech_and_avg_salary(csv_data)),
         ]
