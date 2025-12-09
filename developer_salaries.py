@@ -3,7 +3,7 @@ import plotly.express as px
 import pandas as pd
 import geopandas as gpd
 
-df = pd.read_csv('salaries.csv', delimiter=',', encoding='utf-8')
+csv_data = pd.read_csv('salaries.csv', delimiter=',', encoding='utf-8')
+geo_data = gpd.read_file('C:/Users/ramin/Github/developer-salaries-norway-2024/shapefile/geoBoundaries-NOR-ADM1.geojson')
 
-fylker = gpd.read_file(r'C:\Users\ramin\Github\developer-salaries-norway-2024\shapefile\gadm41_NOR_1.shp')
-fylker.plot(cmp = 'jet', edgecolor = 'black', column = 'fylker')
+print("GeoJson kolonner:", geo_data.columns.tolist())
