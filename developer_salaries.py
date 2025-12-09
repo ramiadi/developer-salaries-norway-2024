@@ -169,6 +169,44 @@ def salary_tech_and_avg_salary(csv_data):
     )
     return fig
 
+# Employment type - using pie chart
+def employment_type(csv_data):
+    employment = (
+        csv_data
+        .groupby("arbeidssituasjon", as_index=False)
+        .size()  # count occurrences instead of mean
+        .rename(columns={'size': 'count'})
+    )
+
+    fig = px.pie(
+        employment,
+        names="arbeidssituasjon",
+        values="count",
+        title="Fordeling av arbeidssituasjon",
+        labels={"arbeidssituasjon": "Arbeidssituasjon", "count": "Antall"},
+        color_discrete_sequence=px.colors.sequential.Viridis,
+    )
+
+    fig.update_traces(
+        textposition="inside",
+        textinfo="percent",
+        textfont=dict(size=14, color="#ffffff"),
+        hovertemplate="<b>%{label}</b><br>Antall: %{value}<br>Prosent: %{percent}",
+        marker_line_color="#ffffff",
+        marker_line_width=0.7,
+    )
+
+    fig.update_layout(
+        height=500,
+        title_font_size=22,
+        title_x=0.5,
+        paper_bgcolor="#1a1a1a",
+        plot_bgcolor="#1a1a1a",
+        font=dict(color="#ffffff", size=14),
+        showlegend=True,
+    )
+    return fig
+
 # ===== BUILD DASHBOARD =====
 def build_dashboard(csv_data, geo_data):
     app = Dash(__name__)
@@ -183,6 +221,7 @@ def build_dashboard(csv_data, geo_data):
                 id="choropleth", figure=build_choropleth_graph(csv_data, geo_data)),
             dcc.Graph(id="experience", figure=avg_salary_and_yearly_experience_graph(csv_data, geo_data)),
             dcc.Graph(id="fag", figure=salary_tech_and_avg_salary(csv_data)),
+            dcc.Graph(id="employment", figure=employment_type(csv_data)),
         ]
     )
     return app
